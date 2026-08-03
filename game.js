@@ -34,6 +34,7 @@
 
   // --- Sound effects: synthesized with the Web Audio API, no external audio files ---
   let audioCtx = null;
+
   function getAudioCtx() {
     const Ctx = window.AudioContext || window.webkitAudioContext;
     if (!Ctx) return null;
@@ -41,6 +42,23 @@
     if (audioCtx.state === "suspended") audioCtx.resume();
     return audioCtx;
   }
+
+  function unlockAudio() {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    // iOS Safari needs a real (even silent) buffer played synchronously inside
+    // a genuine user gesture to fully open the audio output, or tones scheduled
+    // later via a timer (e.g. the D-pad's hold-to-repeat) can end up silent.
+    const buffer = ctx.createBuffer(1, 1, 22050);
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(ctx.destination);
+    source.start(0);
+  }
+
+  ["pointerdown", "touchstart", "keydown"].forEach((evt) => {
+    window.addEventListener(evt, unlockAudio, { once: true, passive: true });
+  });
 
   function tone(ctx, { freq, freqEnd, start, duration, type = "sine", gain = 0.15, vibrato }) {
     const osc = ctx.createOscillator();
@@ -73,17 +91,17 @@
     const ctx = getAudioCtx();
     if (!ctx) return;
     const now = ctx.currentTime;
-    tone(ctx, { freq: 500, freqEnd: 760, start: now, duration: 0.1, type: "sawtooth", gain: 0.1 });
-    tone(ctx, { freq: 760, freqEnd: 380, start: now + 0.08, duration: 0.22, type: "sawtooth", gain: 0.13, vibrato: { rate: 18, depth: 25 } });
+    tone(ctx, { freq: 500, freqEnd: 760, start: now, duration: 0.1, type: "sawtooth", gain: 0.16 });
+    tone(ctx, { freq: 760, freqEnd: 380, start: now + 0.08, duration: 0.22, type: "sawtooth", gain: 0.2, vibrato: { rate: 18, depth: 25 } });
   }
 
   function playUnlock() {
     const ctx = getAudioCtx();
     if (!ctx) return;
     const now = ctx.currentTime;
-    tone(ctx, { freq: 900, start: now, duration: 0.05, type: "square", gain: 0.08 });
-    tone(ctx, { freq: 1100, start: now + 0.09, duration: 0.05, type: "square", gain: 0.08 });
-    tone(ctx, { freq: 500, freqEnd: 1000, start: now + 0.2, duration: 0.35, type: "triangle", gain: 0.15 });
+    tone(ctx, { freq: 900, start: now, duration: 0.05, type: "square", gain: 0.12 });
+    tone(ctx, { freq: 1100, start: now + 0.09, duration: 0.05, type: "square", gain: 0.12 });
+    tone(ctx, { freq: 500, freqEnd: 1000, start: now + 0.2, duration: 0.35, type: "triangle", gain: 0.2 });
   }
 
   function playWinJingle() {
@@ -92,9 +110,9 @@
       const now = ctx.currentTime;
       const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
       notes.forEach((freq, i) => {
-        tone(ctx, { freq, start: now + i * 0.14, duration: 0.4, type: "triangle", gain: 0.13 });
+        tone(ctx, { freq, start: now + i * 0.14, duration: 0.4, type: "triangle", gain: 0.18 });
       });
-      tone(ctx, { freq: 1568, start: now + 0.5, duration: 0.6, type: "sine", gain: 0.07 });
+      tone(ctx, { freq: 1568, start: now + 0.5, duration: 0.6, type: "sine", gain: 0.1 });
     }
     if ("speechSynthesis" in window) {
       const utter = new SpeechSynthesisUtterance("Yay!");
