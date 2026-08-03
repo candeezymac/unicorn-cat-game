@@ -32,6 +32,78 @@
     return r + "," + c;
   }
 
+  // --- Sound effects: synthesized with the Web Audio API, no external audio files ---
+  let audioCtx = null;
+  function getAudioCtx() {
+    const Ctx = window.AudioContext || window.webkitAudioContext;
+    if (!Ctx) return null;
+    if (!audioCtx) audioCtx = new Ctx();
+    if (audioCtx.state === "suspended") audioCtx.resume();
+    return audioCtx;
+  }
+
+  function tone(ctx, { freq, freqEnd, start, duration, type = "sine", gain = 0.15, vibrato }) {
+    const osc = ctx.createOscillator();
+    const g = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, start);
+    if (freqEnd !== undefined) {
+      osc.frequency.linearRampToValueAtTime(freqEnd, start + duration);
+    }
+    if (vibrato) {
+      const lfo = ctx.createOscillator();
+      const lfoGain = ctx.createGain();
+      lfo.frequency.value = vibrato.rate;
+      lfoGain.gain.value = vibrato.depth;
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      lfo.start(start);
+      lfo.stop(start + duration);
+    }
+    g.gain.setValueAtTime(0, start);
+    g.gain.linearRampToValueAtTime(gain, start + Math.min(0.03, duration / 4));
+    g.gain.linearRampToValueAtTime(0, start + duration);
+    osc.connect(g);
+    g.connect(ctx.destination);
+    osc.start(start);
+    osc.stop(start + duration);
+  }
+
+  function playMeow() {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    tone(ctx, { freq: 500, freqEnd: 760, start: now, duration: 0.1, type: "sawtooth", gain: 0.1 });
+    tone(ctx, { freq: 760, freqEnd: 380, start: now + 0.08, duration: 0.22, type: "sawtooth", gain: 0.13, vibrato: { rate: 18, depth: 25 } });
+  }
+
+  function playUnlock() {
+    const ctx = getAudioCtx();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    tone(ctx, { freq: 900, start: now, duration: 0.05, type: "square", gain: 0.08 });
+    tone(ctx, { freq: 1100, start: now + 0.09, duration: 0.05, type: "square", gain: 0.08 });
+    tone(ctx, { freq: 500, freqEnd: 1000, start: now + 0.2, duration: 0.35, type: "triangle", gain: 0.15 });
+  }
+
+  function playWinJingle() {
+    const ctx = getAudioCtx();
+    if (ctx) {
+      const now = ctx.currentTime;
+      const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 E5 G5 C6
+      notes.forEach((freq, i) => {
+        tone(ctx, { freq, start: now + i * 0.14, duration: 0.4, type: "triangle", gain: 0.13 });
+      });
+      tone(ctx, { freq: 1568, start: now + 0.5, duration: 0.6, type: "sine", gain: 0.07 });
+    }
+    if ("speechSynthesis" in window) {
+      const utter = new SpeechSynthesisUtterance("Yay!");
+      utter.pitch = 1.6;
+      utter.rate = 1.1;
+      window.speechSynthesis.speak(utter);
+    }
+  }
+
   // Recursive backtracker maze generation on the logical grid.
   function generateMaze() {
     const g = [];
@@ -98,12 +170,14 @@
     return cells;
   }
 
-  function distanceFromStart() {
-    // BFS distances so we can spread hearts out and confirm the goal is reachable.
+  function reachableDistances(start, blocked) {
+    // BFS distances from `start`, treating `blocked` (the locked gate) as a wall.
+    // The gate is impassable until every heart is collected, so hearts must only
+    // be placed where the cat can reach them without ever crossing it.
     const dist = new Array(GRID_ROWS);
     for (let r = 0; r < GRID_ROWS; r++) dist[r] = new Array(GRID_COLS).fill(-1);
-    const q = [{ r: 1, c: 1 }];
-    dist[1][1] = 0;
+    const q = [start];
+    dist[start.r][start.c] = 0;
     let head = 0;
     const deltas = [[-1, 0], [1, 0], [0, -1], [0, 1]];
     while (head < q.length) {
@@ -113,6 +187,7 @@
         const nc = cur.c + dc;
         if (nr < 0 || nr >= GRID_ROWS || nc < 0 || nc >= GRID_COLS) continue;
         if (grid[nr][nc]) continue;
+        if (nr === blocked.r && nc === blocked.c) continue;
         if (dist[nr][nc] !== -1) continue;
         dist[nr][nc] = dist[cur.r][cur.c] + 1;
         q.push({ r: nr, c: nc });
@@ -129,9 +204,9 @@
     won = false;
     heartsCollected = 0;
 
-    const dist = distanceFromStart();
+    const dist = reachableDistances(cat, goal);
     let cells = openCells().filter(
-      (cell) => !(cell.r === cat.r && cell.c === cat.c) && !(cell.r === goal.r && cell.c === goal.c)
+      (cell) => dist[cell.r][cell.c] !== -1 && !(cell.r === cat.r && cell.c === cat.c)
     );
     // Prefer hearts that are meaningfully far from the start, for a bit of exploration.
     cells.sort((a, b) => dist[b.r][b.c] - dist[a.r][a.c]);
@@ -237,11 +312,16 @@
       heartsCollected += 1;
       heartsCollectedEl.textContent = heartsCollected;
       showToast("Heart collected! 💗");
+      playMeow();
+      if (heartsCollected >= totalHearts()) {
+        playUnlock();
+      }
     }
 
     if (r === goal.r && c === goal.c && heartsCollected >= totalHearts()) {
       won = true;
       winStatsEl.textContent = `Freed with ${moves} moves and all ${totalHearts()} hearts!`;
+      playWinJingle();
       setTimeout(() => winOverlay.classList.remove("hidden"), 200);
     }
 
