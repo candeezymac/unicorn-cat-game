@@ -1,0 +1,188 @@
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  overscroll-behavior: none;
+  background: linear-gradient(180deg, #ffe1f5 0%, #e6d9ff 100%);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: #4a2e57;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  overflow: hidden;
+}
+
+#hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  flex: 0 0 auto;
+}
+
+#hud h1 {
+  font-size: 1.1rem;
+  margin: 0;
+  text-align: center;
+  flex: 1;
+}
+
+.hud-item {
+  font-size: 1rem;
+  font-weight: 600;
+  background: rgba(255,255,255,0.7);
+  border-radius: 999px;
+  padding: 6px 12px;
+  white-space: nowrap;
+}
+
+#newMazeBtn {
+  border: none;
+  background: rgba(255,255,255,0.7);
+  border-radius: 999px;
+  width: 40px;
+  height: 40px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#newMazeBtn:active {
+  transform: scale(0.92);
+}
+
+#toast {
+  position: absolute;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(74, 46, 87, 0.9);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 0.9rem;
+  z-index: 20;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+#toast.hidden {
+  opacity: 0;
+}
+
+#gameArea {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 4px;
+}
+
+#mazeCanvas {
+  background: #fff8fc;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(74, 46, 87, 0.25);
+  touch-action: none;
+}
+
+#controls {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 12px;
+}
+
+.dpad {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.dpad-row {
+  display: flex;
+  gap: 62px;
+}
+
+.dpad-btn {
+  width: 58px;
+  height: 58px;
+  border-radius: 16px;
+  border: none;
+  background: rgba(255,255,255,0.85);
+  box-shadow: 0 3px 8px rgba(74, 46, 87, 0.25);
+  font-size: 1.4rem;
+  color: #a34fb0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dpad-btn:active {
+  background: #ffc9ec;
+  transform: scale(0.94);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(74, 46, 87, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 30;
+}
+
+.overlay.hidden {
+  display: none;
+}
+
+.overlay-card {
+  background: #fff8fc;
+  border-radius: 20px;
+  padding: 28px 24px;
+  text-align: center;
+  max-width: 320px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.win-emoji {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.overlay-card h2 {
+  margin: 0 0 8px;
+}
+
+.overlay-card p {
+  margin: 0 0 18px;
+  color: #7a5c85;
+}
+
+#playAgainBtn {
+  border: none;
+  background: #ff8fd6;
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 999px;
+}
+
+#playAgainBtn:active {
+  transform: scale(0.96);
+}

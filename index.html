@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#ff8fd6" />
+<title>Hearts, Unicorns &amp; Cats</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="hud">
+      <div class="hud-item" id="heartCounter">💗 <span id="heartsCollected">0</span>/<span id="heartsTotal">0</span></div>
+      <h1>Free the Unicorn!</h1>
+      <button id="newMazeBtn" aria-label="New maze">🔀</button>
+    </header>
+
+    <div id="toast" class="hidden"></div>
+
+    <main id="gameArea">
+      <canvas id="mazeCanvas"></canvas>
+    </main>
+
+    <footer id="controls">
+      <div class="dpad">
+        <button class="dpad-btn up" data-dir="up" aria-label="Up">▲</button>
+        <div class="dpad-row">
+          <button class="dpad-btn left" data-dir="left" aria-label="Left">◀</button>
+          <button class="dpad-btn right" data-dir="right" aria-label="Right">▶</button>
+        </div>
+        <button class="dpad-btn down" data-dir="down" aria-label="Down">▼</button>
+      </div>
+    </footer>
+
+    <div id="winOverlay" class="overlay hidden">
+      <div class="overlay-card">
+        <div class="win-emoji">🦄🎉🐱</div>
+        <h2>You freed the unicorn!</h2>
+        <p id="winStats"></p>
+        <button id="playAgainBtn">Play Again</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
