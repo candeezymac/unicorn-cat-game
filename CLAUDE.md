@@ -16,10 +16,14 @@ Everything runs directly in the browser via `<script src="game.js">`.
 - `game.js` — maze generation, game state, rendering (Canvas 2D),
   input (touch/swipe/keyboard), and sound (Web Audio API synthesis)
 - `.github/workflows/deploy-pages.yml` — deploys to GitHub Pages on
-  push to `main` or the working branch. Requires the repo to be
-  public (private repos need a paid GitHub plan for Pages) and the
-  Pages source set to "GitHub Actions" in repo settings (one-time,
-  manual — no API/CLI covers that toggle).
+  push to `main`. Requires the repo to be public (private repos need
+  a paid GitHub plan for Pages) and the Pages source set to "GitHub
+  Actions" in repo settings (one-time, manual — no API/CLI covers
+  that toggle). If `main` is ever renamed or replaced, GitHub's
+  `github-pages` deployment environment can be left with a stale
+  "Deployment branches and tags" rule restricting it to the old
+  branch name — deploys fail instantly (no runner assigned) until
+  that's updated in Settings → Environments → github-pages.
 
 ## Local development
 

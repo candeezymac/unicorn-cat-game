@@ -5,7 +5,9 @@ all the hearts, and reach the locked gate to free the trapped unicorn.
 
 Built as a POC — no build tools, no dependencies, just plain HTML/CSS/JS.
 
-## Play it
+**Play it live:** https://candeezymac.github.io/unicorn-cat-game/
+
+## Run it locally
 
 Open `index.html` in a browser, or serve the folder locally:
 
