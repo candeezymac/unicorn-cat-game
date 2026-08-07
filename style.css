@@ -186,3 +186,9 @@ html, body {
 #playAgainBtn:active {
   transform: scale(0.96);
 }
+
+.made-for {
+  margin: 14px 0 0 !important;
+  font-size: 0.8rem;
+  color: #b892c2;
+}
